@@ -59,7 +59,7 @@ export const PROFILE_DATA = {
     phone: "089509925026",
     whatsappUrl: "https://wa.me/6289509925026",
     linkedin: "https://www.linkedin.com/in/uqi19/",
-    github: "https://github.com/uqi19",
+    github: "https://github.com/sogiahmad",
   },
   education: [
     {
