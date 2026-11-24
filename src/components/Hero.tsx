@@ -33,11 +33,14 @@ export default function Hero() {
   const pullBadgeRef = useRef<HTMLDivElement>(null);
   const shimmerRef = useRef<HTMLDivElement>(null);
   const sparkleLayerRef = useRef<HTMLDivElement>(null);
+  const scrollLinkRef = useRef<HTMLAnchorElement>(null);
+  const scrollArrowRef = useRef<SVGSVGElement>(null);
   const contactTextRef = useRef<HTMLSpanElement>(null);
   const contactArrowRef = useRef<HTMLSpanElement>(null);
   const orbitArrowRef = useRef<HTMLSpanElement>(null);
   const poseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const contactTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scrollAnimRef = useRef<number | null>(null);
   const pendingPoseRef = useRef<PoseKey>("center");
 
   const [activePose, setActivePose] = useState<PoseKey>("center");
@@ -74,6 +77,7 @@ export default function Hero() {
       ctx.revert();
       if (poseTimerRef.current) clearTimeout(poseTimerRef.current);
       if (contactTimerRef.current) clearTimeout(contactTimerRef.current);
+      if (scrollAnimRef.current) cancelAnimationFrame(scrollAnimRef.current);
     };
   }, []);
 
@@ -234,6 +238,68 @@ export default function Hero() {
     }
   };
 
+  const handleScrollClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+
+    if (scrollLinkRef.current) {
+      gsap.killTweensOf(scrollLinkRef.current);
+      gsap.fromTo(
+        scrollLinkRef.current,
+        { y: 0, opacity: 1 },
+        {
+          y: 5,
+          opacity: 0.7,
+          duration: 0.22,
+          yoyo: true,
+          repeat: 1,
+          ease: "power2.out",
+        }
+      );
+    }
+
+    if (scrollArrowRef.current) {
+      gsap.killTweensOf(scrollArrowRef.current);
+      gsap.fromTo(
+        scrollArrowRef.current,
+        { y: 0, scale: 1 },
+        {
+          y: 12,
+          scale: 1.25,
+          duration: 0.35,
+          yoyo: true,
+          repeat: 1,
+          ease: "power2.inOut",
+        }
+      );
+    }
+
+    const targetEl = document.getElementById("marquee");
+    const startY = window.scrollY || window.pageYOffset;
+    const targetY = targetEl
+      ? targetEl.getBoundingClientRect().top + startY
+      : startY + window.innerHeight * 0.85;
+    const distance = targetY - startY;
+    const duration = 850;
+    const startTime = performance.now();
+
+    if (scrollAnimRef.current) cancelAnimationFrame(scrollAnimRef.current);
+
+    const easeInOutCubic = (t: number) =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    const step = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      window.scrollTo(0, startY + distance * easeInOutCubic(progress));
+
+      if (progress < 1) {
+        scrollAnimRef.current = requestAnimationFrame(step);
+      }
+    };
+
+    scrollAnimRef.current = requestAnimationFrame(step);
+  };
+
   const handleContactClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (contactPhase !== "idle") return;
@@ -318,11 +384,30 @@ export default function Hero() {
         <div className="absolute inset-0 bg-gradient-to-b from-obsidian/80 via-obsidian/55 to-obsidian" />
       </div>
 
-      {/* DKV Decorative Cutting Mat Corner Strip */}
+      {/* Ambient Gold Curtain Sweep (Efek cahaya emas halus di background) */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-16 top-24 w-72 h-72 cutting-mat-bg opacity-20 rotate-12 rounded-xl border border-emerald-400/30 hidden lg:block z-0"
-      />
+        className="pointer-events-none absolute inset-0 z-[1] overflow-hidden select-none"
+      >
+        <div
+          style={{
+            animation: "goldCurtainSweep 11s ease-in-out infinite",
+            background:
+              "linear-gradient(100deg, transparent 0%, rgba(245, 158, 11, 0.01) 28%, rgba(251, 191, 36, 0.055) 44%, rgba(255, 77, 0, 0.03) 53%, rgba(253, 224, 71, 0.065) 63%, rgba(245, 158, 11, 0.01) 78%, transparent 100%)",
+          }}
+          className="absolute -inset-y-12 -left-[65%] w-[65%] skew-x-[-10deg] blur-2xl mix-blend-screen will-change-transform"
+        />
+
+        <div
+          style={{
+            animation: "goldCurtainSweep 11s ease-in-out infinite",
+          }}
+          className="absolute inset-y-0 -left-[65%] w-[65%] skew-x-[-10deg] opacity-25 mix-blend-screen will-change-transform"
+        >
+          <div className="absolute inset-y-0 left-[32%] w-14 bg-gradient-to-r from-transparent via-amber-300/10 to-transparent blur-xl" />
+          <div className="absolute inset-y-0 left-[50%] w-20 bg-gradient-to-r from-transparent via-amber-400/12 to-transparent blur-2xl" />
+        </div>
+      </div>
 
       {/* Top Meta Bar */}
       <div className="relative z-10 max-w-[1440px] w-full mx-auto flex flex-wrap items-center justify-between gap-4 pt-1 hero-stagger">
@@ -498,11 +583,16 @@ export default function Hero() {
         </p>
 
         <a
+          ref={scrollLinkRef}
           href="#marquee"
+          onClick={handleScrollClick}
           className="hidden md:flex flex-col items-center gap-1 font-sans font-semibold text-[10px] tracking-[0.2em] text-neutral-500 hover:text-white transition-colors"
         >
           <span>SCROLL</span>
-          <ArrowDown className="w-3.5 h-3.5 animate-bounce text-accent" />
+          <ArrowDown
+            ref={scrollArrowRef}
+            className="w-3.5 h-3.5 animate-bounce text-accent"
+          />
         </a>
 
         <div className="relative inline-flex items-center justify-center">
@@ -550,6 +640,26 @@ export default function Hero() {
       </div>
 
       <style jsx>{`
+        @keyframes goldCurtainSweep {
+          0% {
+            transform: translateX(0%) skewX(-10deg);
+            opacity: 0;
+          }
+          15% {
+            opacity: 0.5;
+          }
+          50% {
+            opacity: 0.65;
+          }
+          85% {
+            opacity: 0.45;
+          }
+          100% {
+            transform: translateX(275%) skewX(-10deg);
+            opacity: 0;
+          }
+        }
+
         @keyframes contactSlide4s {
           from {
             width: 0%;
