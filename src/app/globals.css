@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-dark: #0d0d0d;
+  --bg-cream: #ebe7e0;
+  --accent: #ff4d00;
+}
+
+@layer base {
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0d0d0d;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #333333;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #ff4d00;
+  }
+}
+
+/* Reusable Top Section Curve (Matches Codecuy Section Transitions) */
+.section-curve {
+  border-top-left-radius: 2.25rem;
+  border-top-right-radius: 2.25rem;
+}
+
+@media (min-width: 768px) {
+  .section-curve {
+    border-top-left-radius: 3.5rem;
+    border-top-right-radius: 3.5rem;
+  }
+}
+
+/* Metallic Silver Gradient Heading (Matches Codecuy Display Titles) */
+.heading-metallic {
+  background: linear-gradient(180deg, #f3f1ed 0%, #dcd8d0 55%, #8d8a84 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* DKV Cutting Mat Grid Texture */
+.cutting-mat-bg {
+  background-color: #134e2c;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.14) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.14) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px, 40px 40px, 8px 8px, 8px 8px;
+}
+
+/* DKV Corkboard Texture */
+.corkboard-bg {
+  background-color: #8f653c;
+  background-image:
+    radial-gradient(rgba(45, 26, 10, 0.25) 1px, transparent 0),
+    radial-gradient(rgba(235, 200, 155, 0.2) 1px, transparent 0);
+  background-size: 14px 14px;
+  background-position: 0 0, 7px 7px;
+}
+
+/* DKV Torn Paper Edge Effect */
+.torn-paper {
+  clip-path: polygon(
+    0% 2%, 4% 0%, 9% 2%, 14% 0%, 19% 2%, 25% 0%, 31% 2%, 37% 0%, 43% 2%, 49% 0%,
+    55% 2%, 61% 0%, 67% 2%, 73% 0%, 79% 2%, 85% 0%, 91% 2%, 96% 0%, 100% 2%,
+    99% 12%, 100% 24%, 99% 38%, 100% 52%, 99% 67%, 100% 82%, 99% 98%,
+    95% 100%, 89% 98%, 83% 100%, 77% 98%, 71% 100%, 65% 98%, 59% 100%, 53% 98%,
+    47% 100%, 41% 98%, 35% 100%, 29% 98%, 23% 100%, 17% 98%, 11% 100%, 5% 98%, 0% 100%,
+    1% 86%, 0% 71%, 1% 56%, 0% 41%, 1% 26%, 0% 12%
+  );
+}
+
+.torn-strip {
+  clip-path: polygon(
+    1% 6%, 6% 0%, 14% 4%, 23% 0%, 34% 5%, 45% 0%, 57% 4%, 68% 0%, 79% 5%, 89% 0%, 99% 4%,
+    98% 94%, 90% 100%, 80% 95%, 69% 100%, 58% 96%, 46% 100%, 35% 95%, 24% 100%, 13% 96%, 2% 100%
+  );
+}
+
+/* DKV Translucent Masking Tape */
+.masking-tape {
+  background: linear-gradient(
+    135deg,
+    rgba(244, 236, 214, 0.82) 0%,
+    rgba(232, 221, 192, 0.72) 100%
+  );
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(2px);
+}
+
+/* Edge Dissolve Mask agar teks berjalan muncul & menghilang halus di tepi padding */
+.ribbon-edge-mask {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 10%,
+    #000 90%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 10%,
+    #000 90%,
+    transparent 100%
+  );
+}
+
+/* Crossed Marquee Ribbons di BrandBanner */
+@keyframes bannerMarqueeLeft {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-33.333%, 0, 0);
+  }
+}
+
+@keyframes bannerMarqueeRight {
+  0% {
+    transform: translate3d(-33.333%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-marquee-left {
+  animation: bannerMarqueeLeft 24s linear infinite;
+}
+
+.animate-marquee-right {
+  animation: bannerMarqueeRight 26s linear infinite;
+}
+
+/* Efek Muncul & Menghilang (Dissolve) 5 Detik ala CapCut */
+@keyframes capcutDissolve5s {
+  0% {
+    opacity: 0;
+    transform: scale(0.985);
+    filter: blur(6px);
+  }
+  16% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+  84% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.985);
+    filter: blur(6px);
+  }
+}
+
+.animate-capcut-5s {
+  animation: capcutDissolve5s 5s ease-in-out infinite;
+}
+
+.section-reveal-item {
+  will-change: transform, opacity;
+}
