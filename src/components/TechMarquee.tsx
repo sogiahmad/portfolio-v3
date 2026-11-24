@@ -13,6 +13,7 @@ import {
   Terminal,
   GitBranch,
   ShieldCheck,
+  Server,
   Pause,
   Play,
 } from "lucide-react";
@@ -28,7 +29,7 @@ interface TechTile {
   iconType:
     | "db"
     | "js"
-    | "code"
+    | "php"
     | "html"
     | "css"
     | "data"
@@ -58,7 +59,7 @@ const TECH_TILES: TechTile[] = [
     id: "php",
     label: "PHP",
     category: "stack",
-    iconType: "code",
+    iconType: "php",
     accentClass: "text-indigo-400",
   },
   {
@@ -119,7 +120,7 @@ function renderTileIcon(iconType: TechTile["iconType"], accentClass: string) {
       return <Database className={cls} />;
     case "js":
       return <Terminal className={cls} />;
-    case "code":
+    case "php":
       return <Code2 className={cls} />;
     case "html":
       return <FileCode2 className={cls} />;
@@ -130,7 +131,7 @@ function renderTileIcon(iconType: TechTile["iconType"], accentClass: string) {
     case "cert":
       return <Award className={cls} />;
     case "backend":
-      return <Code2 className={cls} />;
+      return <Server className={cls} />;
     case "git":
       return <GitBranch className={cls} />;
     case "security":
@@ -142,24 +143,25 @@ export default function CoreTechMarquee() {
   const sectionRef = useRef<HTMLElement>(null);
   const [filter, setFilter] = useState<TechCategory>("all");
   const [isPaused, setIsPaused] = useState(false);
+  const [filterTick, setFilterTick] = useState(0);
 
   useEffect(() => {
-  const ctx = gsap.context(() => {
-    gsap.from(".marquee-entrance", {
-      y: 36,
-      opacity: 0,
-      duration: 0.75,
-      stagger: 0.12,
-      ease: "power3.out",
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top 82%",
-        toggleActions: "play reverse play reverse",
-      },
-    });
-  }, sectionRef);
-  return () => ctx.revert();
-}, []);
+    const ctx = gsap.context(() => {
+      gsap.from(".marquee-entrance", {
+        y: 36,
+        opacity: 0,
+        duration: 0.75,
+        stagger: 0.12,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 82%",
+          toggleActions: "play reverse play reverse",
+        },
+      });
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
 
   const filtered =
     filter === "all"
@@ -204,26 +206,32 @@ export default function CoreTechMarquee() {
                 { key: "stack", label: "TECH STACK" },
                 { key: "certifications", label: "CERTIFICATIONS" },
               ] as const
-            ).map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setFilter(tab.key)}
-                className={`px-3 py-1 rounded-full font-mono text-[10px] font-bold tracking-[0.14em] uppercase transition-all cursor-pointer ${
-                  filter === tab.key
-                    ? "bg-accent text-white"
-                    : "bg-white/[0.04] text-neutral-400 hover:text-white border border-white/10"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+            ).map((tab) => {
+              const isSelected = filter === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => {
+                    setFilter(tab.key);
+                    setFilterTick((prev) => prev + 1);
+                  }}
+                  className={`px-3 py-1 rounded-full font-mono text-[10px] font-bold tracking-[0.14em] uppercase transition-all duration-200 cursor-pointer ${
+                    isSelected
+                      ? "bg-accent text-white shadow-[0_0_18px_rgba(255,77,0,0.45)]"
+                      : "bg-white/[0.04] text-neutral-400 hover:text-amber-300 hover:border-amber-400/50 hover:bg-amber-400/10 hover:shadow-[0_0_14px_rgba(251,191,36,0.28)] border border-white/10"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
 
             <button
               type="button"
               onClick={() => setIsPaused((prev) => !prev)}
               aria-label={isPaused ? "Resume marquee" : "Pause marquee"}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] hover:bg-white/[0.1] border border-white/15 font-mono text-[10px] font-bold tracking-[0.14em] text-neutral-300 uppercase transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] hover:bg-amber-400/10 hover:text-amber-300 hover:border-amber-400/50 hover:shadow-[0_0_14px_rgba(251,191,36,0.28)] border border-white/15 font-mono text-[10px] font-bold tracking-[0.14em] text-neutral-300 uppercase transition-all duration-200 cursor-pointer"
             >
               {isPaused ? (
                 <>
@@ -238,8 +246,13 @@ export default function CoreTechMarquee() {
               )}
             </button>
 
-            <span className="ml-1 font-mono text-[11px] tracking-[0.18em] text-neutral-400 uppercase">
-              2022 TO 2026
+            <span className="ml-1 inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.18em] text-neutral-400 uppercase">
+              <span
+                className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                  isPaused ? "bg-neutral-500" : "bg-accent animate-pulse"
+                }`}
+              />
+              <span>2022 TO 2026</span>
             </span>
           </div>
         </div>
@@ -247,9 +260,11 @@ export default function CoreTechMarquee() {
 
       {/* Jalur 1: Bergerak ke Kiri */}
       <div
+        key={`top-track-${filter}-${filterTick}`}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
-        className="marquee-entrance section-reveal-item relative overflow-hidden py-2"
+        style={{ animation: "trackFadeIn 0.35s ease-out" }}
+        className="marquee-entrance section-reveal-item relative z-10 overflow-hidden py-2"
       >
         <div
           style={{
@@ -258,27 +273,53 @@ export default function CoreTechMarquee() {
           }}
           className="flex w-max gap-4 px-6"
         >
-          {topRowItems.map((tile, i) => (
-            <div
-              key={`top-${tile.id}-${i}`}
-              className="w-56 sm:w-64 shrink-0 rounded-2xl bg-[#141414]/90 hover:bg-[#1A1A1A] border border-white/10 hover:border-accent/60 p-5 flex flex-col items-center justify-center gap-3 transition-all duration-300 hover:-translate-y-1"
-            >
-              <div className="w-11 h-11 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center">
-                {renderTileIcon(tile.iconType, tile.accentClass)}
+          {topRowItems.map((tile, i) => {
+            const isCert = tile.category === "certifications";
+            return (
+              <div
+                key={`top-${tile.id}-${i}`}
+                className="w-56 sm:w-64 shrink-0 rounded-2xl bg-[#141414]/90 border border-white/10 p-5 flex flex-col items-center justify-center gap-3"
+              >
+                {/* Badge dengan border setengah saja (bagian atas & kanan) */}
+                <span
+                  className={`relative self-end -mt-2 -mr-1 font-mono text-[9px] font-bold tracking-[0.14em] uppercase px-2.5 py-0.5 rounded-full overflow-hidden ${
+                    isCert
+                      ? "bg-amber-400/10 text-amber-300"
+                      : "bg-white/[0.04] text-neutral-300"
+                  }`}
+                >
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      animation: `halfBadgeSweep 3.2s ease-in-out ${(i % 4) * 0.35}s infinite`,
+                    }}
+                    className="pointer-events-none absolute top-0 right-0 w-1/2 h-1/2 rounded-tr-full border-t border-r border-amber-300/80"
+                  />
+                  <span className="relative z-10">
+                    {isCert ? "CERT" : "STACK"}
+                  </span>
+                </span>
+
+                <div className="w-11 h-11 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center">
+                  {renderTileIcon(tile.iconType, tile.accentClass)}
+                </div>
+
+                <span className="font-mono text-[11px] font-bold tracking-[0.16em] text-neutral-200 uppercase text-center">
+                  {tile.label}
+                </span>
               </div>
-              <span className="font-mono text-[11px] font-bold tracking-[0.16em] text-neutral-200 uppercase text-center">
-                {tile.label}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
       {/* Jalur 2: Bergerak ke Kanan (Berlawanan Arah) */}
       <div
+        key={`bottom-track-${filter}-${filterTick}`}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
-        className="marquee-entrance section-reveal-item relative overflow-hidden py-2 mt-2"
+        style={{ animation: "trackFadeIn 0.35s ease-out" }}
+        className="marquee-entrance section-reveal-item relative z-10 overflow-hidden py-2 mt-2"
       >
         <div
           style={{
@@ -287,19 +328,43 @@ export default function CoreTechMarquee() {
           }}
           className="flex w-max gap-4 px-6"
         >
-          {bottomRowItems.map((tile, i) => (
-            <div
-              key={`bottom-${tile.id}-${i}`}
-              className="w-56 sm:w-64 shrink-0 rounded-2xl bg-[#141414]/90 hover:bg-[#1A1A1A] border border-white/10 hover:border-amber-400/60 p-5 flex flex-col items-center justify-center gap-3 transition-all duration-300 hover:-translate-y-1"
-            >
-              <div className="w-11 h-11 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center">
-                {renderTileIcon(tile.iconType, tile.accentClass)}
+          {bottomRowItems.map((tile, i) => {
+            const isCert = tile.category === "certifications";
+            return (
+              <div
+                key={`bottom-${tile.id}-${i}`}
+                className="w-56 sm:w-64 shrink-0 rounded-2xl bg-[#141414]/90 border border-white/10 p-5 flex flex-col items-center justify-center gap-3"
+              >
+                {/* Badge dengan border setengah saja (bagian atas & kanan) */}
+                <span
+                  className={`relative self-end -mt-2 -mr-1 font-mono text-[9px] font-bold tracking-[0.14em] uppercase px-2.5 py-0.5 rounded-full overflow-hidden ${
+                    isCert
+                      ? "bg-amber-400/10 text-amber-300"
+                      : "bg-white/[0.04] text-neutral-300"
+                  }`}
+                >
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      animation: `halfBadgeSweep 3.2s ease-in-out ${(i % 4) * 0.35}s infinite`,
+                    }}
+                    className="pointer-events-none absolute top-0 right-0 w-1/2 h-1/2 rounded-tr-full border-t border-r border-amber-300/80"
+                  />
+                  <span className="relative z-10">
+                    {isCert ? "CERT" : "STACK"}
+                  </span>
+                </span>
+
+                <div className="w-11 h-11 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center">
+                  {renderTileIcon(tile.iconType, tile.accentClass)}
+                </div>
+
+                <span className="font-mono text-[11px] font-bold tracking-[0.16em] text-neutral-200 uppercase text-center">
+                  {tile.label}
+                </span>
               </div>
-              <span className="font-mono text-[11px] font-bold tracking-[0.16em] text-neutral-200 uppercase text-center">
-                {tile.label}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -319,6 +384,29 @@ export default function CoreTechMarquee() {
           }
           100% {
             transform: translate3d(0, 0, 0);
+          }
+        }
+
+        @keyframes trackFadeIn {
+          0% {
+            opacity: 0.4;
+            transform: translateY(6px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes halfBadgeSweep {
+          0%,
+          100% {
+            opacity: 0.35;
+            transform: scale(0.96);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.04);
           }
         }
       `}</style>
