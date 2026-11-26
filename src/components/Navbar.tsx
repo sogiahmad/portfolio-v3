@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { PROFILE_DATA } from "@/data/portfolio";
 
@@ -17,13 +17,20 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const [navTextVisible, setNavTextVisible] = useState<boolean>(false);
+  const manualClickTimerRef = useRef<number | null>(null);
+  const isManualSelectingRef = useRef<boolean>(false);
 
   useEffect(() => {
     const showTimer = window.setTimeout(() => {
       setNavTextVisible(true);
     }, 750);
 
-    return () => window.clearTimeout(showTimer);
+    return () => {
+      window.clearTimeout(showTimer);
+      if (manualClickTimerRef.current) {
+        window.clearTimeout(manualClickTimerRef.current);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -36,6 +43,13 @@ export default function Navbar() {
       const ratio =
         maxScroll > 0 ? Math.min(1, Math.max(0, y / maxScroll)) : 0;
       setScrollProgress(ratio * 100);
+
+      if (isManualSelectingRef.current) return;
+
+      if (y < 120) {
+        setActiveId("");
+        return;
+      }
 
       const currentPos = y + 180;
       let matched = "";
@@ -53,6 +67,18 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleNavClick = (id: string) => {
+    setActiveId(id);
+    setMobileOpen(false);
+    isManualSelectingRef.current = true;
+    if (manualClickTimerRef.current) {
+      window.clearTimeout(manualClickTimerRef.current);
+    }
+    manualClickTimerRef.current = window.setTimeout(() => {
+      isManualSelectingRef.current = false;
+    }, 900);
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md transition-all duration-300 ${
@@ -66,52 +92,92 @@ export default function Navbar() {
           isScrolled ? "h-14 md:h-[68px]" : "h-16 md:h-20"
         }`}
       >
-        {/* Brand Logo + Cincin Orbit Berputar */}
+        {/* Brand Logo + Garis Hidup ~2/8 Mengelilingi Tulisan */}
         <a
           href="#top"
           onClick={() => {
-            setActiveId("");
-            setMobileOpen(false);
+            handleNavClick("");
           }}
-          className={`relative px-3 py-1.5 font-display text-base md:text-lg tracking-[0.04em] text-white inline-flex items-center group transition-all duration-700 ease-out ${
+          className={`relative px-3.5 py-1.5 font-display text-base md:text-lg tracking-[0.04em] text-white inline-flex items-center group transition-all duration-700 ease-out ${
             navTextVisible
               ? "opacity-100 translate-y-0"
               : "opacity-0 -translate-y-2 pointer-events-none"
           }`}
         >
-          {/* Cincin berputar halus mengelilingi tulisan */}
-          <span
+          {/* SVG orbit ~2/8 keliling (90 deg arc) */}
+          <svg
             aria-hidden="true"
-            className="pointer-events-none absolute -inset-x-1.5 -inset-y-1 rounded-full overflow-hidden opacity-65 group-hover:opacity-100 transition-opacity duration-300"
+            viewBox="0 0 120 44"
+            preserveAspectRatio="none"
+            style={{ animation: "navArcSpin 5.2s linear infinite" }}
+            className="pointer-events-none absolute -inset-x-1 -inset-y-0.5 w-[calc(100%+8px)] h-[calc(100%+4px)] opacity-75 group-hover:opacity-100 transition-opacity duration-300"
           >
-            <span
-              style={{
-                animation: "brandRingOrbit 5.5s linear infinite",
-                background:
-                  "conic-gradient(from 0deg, transparent 0%, rgba(251,191,36,0.55) 18%, rgba(255,77,0,0.9) 34%, transparent 52%, rgba(251,191,36,0.35) 75%, transparent 100%)",
-              }}
-              className="absolute -inset-6 block"
+            <ellipse
+              cx="60"
+              cy="22"
+              rx="57"
+              ry="19"
+              fill="none"
+              stroke="url(#brandTwoEighthsGrad)"
+              strokeWidth="1.4"
+              strokeDasharray="68 204"
+              strokeLinecap="round"
             />
-            <span className="absolute inset-[1.5px] rounded-full bg-obsidian/95" />
-          </span>
+            <defs>
+              <linearGradient
+                id="brandTwoEighthsGrad"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+              >
+                <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.95" />
+                <stop offset="100%" stopColor="#FF4D00" stopOpacity="0.85" />
+              </linearGradient>
+            </defs>
+          </svg>
 
           <span className="relative z-10 inline-flex items-start">
             <span>{PROFILE_DATA.brand}</span>
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-accent ml-0.5 mt-0.5 shadow-[0_0_8px_rgba(255,77,0,0.85)] transition-transform duration-300 group-hover:scale-125" />
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-accent ml-0.5 mt-0.5 transition-transform duration-300 group-hover:scale-125" />
           </span>
         </a>
 
-        {/* Center Status Pill + Denyut Sonar Ganda */}
+        {/* Center Status Pill + Garis Hidup ~3/8 + Hover Hijau */}
         <div
-          className={`group/pill hidden md:flex items-center gap-2.5 bg-white/[0.04] hover:bg-white/[0.07] border border-white/[0.09] hover:border-emerald-400/40 rounded-full px-4 py-1.5 shadow-[0_0_0_rgba(16,185,129,0)] hover:shadow-[0_0_20px_rgba(16,185,129,0.16)] transition-all duration-500 ease-out ${
+          className={`group/pill relative hidden md:flex items-center gap-2.5 bg-white/[0.04] hover:bg-emerald-500/[0.06] border border-white/[0.09] hover:border-emerald-400/35 rounded-full px-4 py-1.5 transition-all duration-500 ease-out ${
             navTextVisible
               ? "opacity-100 translate-y-0"
               : "opacity-0 -translate-y-2 pointer-events-none"
           }`}
         >
-          <span className="relative flex h-2.5 w-2.5 items-center justify-center">
+          {/* Garis hidup ~3/8 keliling (135 deg arc), menyala hijau saat hover */}
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 260 40"
+            preserveAspectRatio="none"
+            style={{ animation: "navArcSpin 6s linear infinite" }}
+            className="pointer-events-none absolute -inset-x-1 -inset-y-0.5 w-[calc(100%+8px)] h-[calc(100%+4px)] text-emerald-400/45 group-hover/pill:text-emerald-400 transition-colors duration-300"
+          >
+            <rect
+              x="2"
+              y="2"
+              width="256"
+              height="36"
+              rx="18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeDasharray="195 325"
+              strokeLinecap="round"
+            />
+          </svg>
+
+          <span className="relative z-10 flex h-2.5 w-2.5 items-center justify-center">
             <span
-              style={{ animation: "sonarPulse 2.4s cubic-bezier(0, 0, 0.2, 1) infinite" }}
+              style={{
+                animation: "sonarPulse 2.4s cubic-bezier(0, 0, 0.2, 1) infinite",
+              }}
               className="absolute inline-flex h-full w-full rounded-full bg-emerald-400/75"
             />
             <span
@@ -123,12 +189,12 @@ export default function Navbar() {
             />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400 shadow-[0_0_10px_#34d399] transition-transform duration-300 group-hover/pill:scale-125" />
           </span>
-          <span className="font-sans font-semibold text-[11px] tracking-[0.14em] text-neutral-300 group-hover/pill:text-white uppercase transition-colors">
+          <span className="relative z-10 font-sans font-semibold text-[11px] tracking-[0.14em] text-neutral-300 group-hover/pill:text-emerald-200 uppercase transition-colors">
             {PROFILE_DATA.roleBadge}
           </span>
         </div>
 
-        {/* Desktop Nav Links + Hover Underline Efek Riak Air */}
+        {/* Desktop Nav Links + Underline Warna Tema + Riak */}
         <nav
           className={`hidden sm:flex items-center gap-6 md:gap-8 transition-all duration-700 delay-100 ease-out ${
             navTextVisible
@@ -142,6 +208,7 @@ export default function Navbar() {
               <a
                 key={item.label}
                 href={item.href}
+                onClick={() => handleNavClick(item.id)}
                 className={`group/link relative py-1 font-sans font-bold text-[11px] md:text-xs tracking-[0.14em] uppercase transition-all duration-300 hover:-translate-y-[1px] ${
                   isActive
                     ? "text-amber-300"
@@ -149,7 +216,6 @@ export default function Navbar() {
                 }`}
               >
                 <span>{item.label}</span>
-                {/* Garis bawah dengan efek riak/gelombang mengalir saat hover */}
                 <span
                   className={`pointer-events-none absolute left-0 right-0 -bottom-0.5 h-[2px] overflow-hidden rounded-full transition-transform duration-300 origin-left ${
                     isActive
@@ -159,9 +225,9 @@ export default function Navbar() {
                 >
                   <span
                     style={{
-                      animation: "waterRippleFlow 1.8s linear infinite",
+                      animation: "themeRippleFlow 1.9s linear infinite",
                       background:
-                        "linear-gradient(90deg, #FF4D00 0%, #FBBF24 25%, #38BDF8 50%, #FBBF24 75%, #FF4D00 100%)",
+                        "linear-gradient(90deg, #FF4D00 0%, #FBBF24 45%, #FF8A00 75%, #FF4D00 100%)",
                       backgroundSize: "200% 100%",
                     }}
                     className="block w-full h-full"
@@ -189,7 +255,7 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Dropdown dengan Transisi Buka/Tutup Halus */}
+      {/* Mobile Dropdown */}
       <div
         className={`sm:hidden overflow-hidden bg-[#121212] transition-all duration-300 ease-out ${
           mobileOpen
@@ -207,7 +273,7 @@ export default function Navbar() {
               <a
                 key={item.label}
                 href={item.href}
-                onClick={() => setMobileOpen(false)}
+                onClick={() => handleNavClick(item.id)}
                 className="py-2.5 font-sans font-bold text-xs tracking-[0.14em] text-neutral-200 hover:text-accent uppercase transition-colors"
               >
                 {item.label}
@@ -226,7 +292,7 @@ export default function Navbar() {
       </div>
 
       <style jsx>{`
-        @keyframes brandRingOrbit {
+        @keyframes navArcSpin {
           from {
             transform: rotate(0deg);
           }
@@ -250,7 +316,7 @@ export default function Navbar() {
           }
         }
 
-        @keyframes waterRippleFlow {
+        @keyframes themeRippleFlow {
           0% {
             background-position: 0% 50%;
           }
