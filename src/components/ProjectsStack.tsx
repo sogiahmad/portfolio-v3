@@ -62,8 +62,10 @@ export default function ProjectsStack() {
   );
   const listToRender =
     visibleProjects.length > 0 ? visibleProjects : PROJECTS_DATA;
+  const isSingleCard = listToRender.length === 1;
   const safeActiveIdx = Math.min(activeCardIdx, listToRender.length - 1);
 
+  // Animasi masuk header Projects tetap berjalan normal seperti semula
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.from(".projects-header-entrance", {
@@ -77,7 +79,16 @@ export default function ProjectsStack() {
           toggleActions: "play reverse play reverse",
         },
       });
+    }, containerRef);
 
+    return () => ctx.revert();
+  }, []);
+
+  // Setup stack scrolltrigger & refresh posisi section bawah saat filter berubah (termasuk Security Audit 1 kartu)
+  useEffect(() => {
+    cardsRef.current = cardsRef.current.slice(0, listToRender.length);
+
+    const ctx = gsap.context(() => {
       const cards = cardsRef.current.filter(Boolean);
 
       cards.forEach((card, index) => {
@@ -105,8 +116,15 @@ export default function ProjectsStack() {
       });
     }, containerRef);
 
-    return () => ctx.revert();
-  }, [activeFilter]);
+    const timer = window.setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 60);
+
+    return () => {
+      window.clearTimeout(timer);
+      ctx.revert();
+    };
+  }, [activeFilter, listToRender.length]);
 
   const handleCardMouseMove = (
     e: React.MouseEvent<HTMLDivElement>,
@@ -214,7 +232,11 @@ export default function ProjectsStack() {
         key={`list-${activeFilter}-${filterAnimTick}`}
         className="relative z-10 max-w-[920px] mx-auto"
       >
-        <div className="relative space-y-10 md:space-y-14 pb-8">
+        <div
+          className={`relative ${
+            isSingleCard ? "pb-4" : "space-y-10 md:space-y-14 pb-8"
+          }`}
+        >
           {listToRender.map((project, index) => {
             const topOffset = 88 + index * 20;
             const isCurrentCard = index === safeActiveIdx;
@@ -230,10 +252,12 @@ export default function ProjectsStack() {
                 onMouseMove={(e) => handleCardMouseMove(e, project.id)}
                 onMouseLeave={() => handleCardMouseLeave(project.id)}
                 style={{
-                  top: `${topOffset}px`,
+                  top: isSingleCard ? undefined : `${topOffset}px`,
                   animation: `projectCardReveal 0.48s cubic-bezier(0.22, 1, 0.36, 1) ${Math.min(index * 0.08, 0.24)}s both`,
                 }}
-                className={`group/card relative sticky rounded-[1.75rem] bg-[#141414] border p-6 sm:p-8 md:p-9 shadow-[0_-18px_50px_rgba(0,0,0,0.85)] transition-colors duration-300 will-change-transform overflow-hidden ${
+                className={`group/card relative ${
+                  isSingleCard ? "" : "sticky"
+                } rounded-[1.75rem] bg-[#141414] border p-6 sm:p-8 md:p-9 shadow-[0_-18px_50px_rgba(0,0,0,0.85)] transition-colors duration-300 will-change-transform overflow-hidden ${
                   isCurrentCard
                     ? "border-amber-400/40"
                     : "border-white/[0.12] hover:border-white/25"
