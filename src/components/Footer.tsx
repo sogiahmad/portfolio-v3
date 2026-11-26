@@ -28,6 +28,7 @@ export default function Footer() {
       id="contact"
       className="relative bg-obsidian text-cream border-t border-white/10 pt-10 pb-8 px-6 md:px-12 overflow-hidden"
     >
+      {/* Garis kilau tipis bernuansa emas-oranye di batas atas footer */}
       <span
         aria-hidden="true"
         style={{
@@ -39,6 +40,7 @@ export default function Footer() {
       />
 
       <div className="relative z-20 max-w-[1440px] mx-auto">
+        {/* Bagian atas berisi: ringkasan singkat + kolom navigasi & kontak */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pb-9 border-b border-white/10">
           <div className="md:col-span-6 space-y-3">
             <div className="font-display text-xl tracking-tight uppercase text-white">
@@ -77,17 +79,26 @@ export default function Footer() {
             </div>
             <ul className="space-y-1.5 font-sans text-xs text-neutral-400">
               <li>
-                <a href="#about" className="hover:text-white transition-colors">
+                <a
+                  href="#about"
+                  className="hover:text-white transition-colors"
+                >
                   About
                 </a>
               </li>
               <li>
-                <a href="#services" className="hover:text-white transition-colors">
+                <a
+                  href="#services"
+                  className="hover:text-white transition-colors"
+                >
                   Services
                 </a>
               </li>
               <li>
-                <a href="#work" className="hover:text-white transition-colors">
+                <a
+                  href="#work"
+                  className="hover:text-white transition-colors"
+                >
                   Work
                 </a>
               </li>
@@ -141,22 +152,24 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Wordmark besar 3D timbul sudah aktif sejak awal (sebelum hover) */}
         <div
           data-no-gold-cursor
-          className="relative pt-6 pb-2 select-none w-full overflow-hidden group"
+          className="relative pt-6 pb-2 select-none w-full overflow-hidden"
         >
           <h2
             data-no-gold-cursor
             style={{
               textShadow:
-                "0px -1px 0px rgba(255,255,255,0.11), 0px 4px 10px rgba(0,0,0,0.9), 0px 14px 28px rgba(0,0,0,0.75)",
+                "0px -1px 0px rgba(255,255,255,0.14), 0px 4px 10px rgba(0,0,0,0.92), 0px 14px 28px rgba(0,0,0,0.8)",
             }}
-            className="relative w-full font-display font-extrabold uppercase text-[#151515] group-hover:text-[#1A1A1A] tracking-[-0.04em] leading-[0.84] text-[22.5vw] text-center transition-colors duration-300"
+            className="relative w-full font-display font-extrabold uppercase text-[#1A1A1A] tracking-[-0.04em] leading-[0.84] text-[22.5vw] text-center"
           >
             {monumentWord}
           </h2>
         </div>
 
+        {/* Baris Bawah */}
         <div className="pt-4 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 font-mono text-[11px] tracking-[0.14em] uppercase text-neutral-400">
           <div>2026 SYAUQI AHMAD</div>
 
