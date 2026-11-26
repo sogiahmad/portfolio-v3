@@ -53,13 +53,50 @@ export default function Hero() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".hero-stagger", {
-        y: 30,
+      const tl = gsap.timeline();
+
+      tl.set(".hero-left-item, .hero-card-item, .hero-bottom-item", {
         opacity: 0,
-        duration: 0.8,
-        stagger: 0.08,
-        ease: "power3.out",
-      });
+      })
+        // 1. Bagian kiri muncul bertahap lebih dulu
+        .fromTo(
+          ".hero-left-item",
+          { y: 24, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.68,
+            stagger: 0.1,
+            ease: "power3.out",
+          },
+          0.12
+        )
+        // 2. Lanjut ke card foto
+        .fromTo(
+          ".hero-card-item",
+          { y: 26, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.72,
+            stagger: 0.1,
+            ease: "power3.out",
+          },
+          0.55
+        )
+        // 3. Terakhir bagian bawah (SCROLL dan CONTACT ME)
+        .fromTo(
+          ".hero-bottom-item",
+          { y: 20, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.65,
+            stagger: 0.08,
+            ease: "power3.out",
+          },
+          0.85
+        );
 
       if (floatWrapperRef.current) {
         gsap.to(floatWrapperRef.current, {
@@ -409,8 +446,8 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Top Meta Bar */}
-      <div className="relative z-10 max-w-[1440px] w-full mx-auto flex flex-wrap items-center justify-between gap-4 pt-1 hero-stagger">
+      {/* Top Meta Bar (Bagian Kiri) */}
+      <div className="relative z-10 max-w-[1440px] w-full mx-auto flex flex-wrap items-center justify-between gap-4 pt-1 hero-left-item">
         <span className="font-sans font-semibold text-[11px] md:text-xs tracking-[0.18em] text-neutral-400 uppercase">
           {PROFILE_DATA.location}
         </span>
@@ -420,22 +457,26 @@ export default function Hero() {
       <div className="relative z-10 max-w-[1440px] w-full mx-auto my-auto py-4 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         {/* Left / Center Massive Headline */}
         <div className="lg:col-span-8 xl:col-span-9">
-          <div className="hero-stagger inline-block mb-3 relative">
+          <div className="hero-left-item inline-block mb-3 relative">
             <div className="masking-tape w-16 h-4 absolute -top-2 left-6 -rotate-3 z-10" />
             <div className="torn-strip bg-cream text-obsidian px-4 py-1.5 font-hand text-lg md:text-xl font-bold tracking-wide shadow-md -rotate-1">
               UIN Jakarta • Information Systems &apos;23
             </div>
           </div>
 
-          <h1 className="hero-stagger font-display uppercase leading-[0.9] tracking-[-0.03em] text-[clamp(3.3rem,10.2vw,9rem)] select-none">
-            <span className="block heading-metallic">HI, I&apos;M</span>
-            <span className="block text-accent">{PROFILE_DATA.brand}</span>
+          <h1 className="font-display uppercase leading-[0.9] tracking-[-0.03em] text-[clamp(3.3rem,10.2vw,9rem)] select-none">
+            <span className="hero-left-item block heading-metallic">
+              HI, I&apos;M
+            </span>
+            <span className="hero-left-item block text-accent">
+              {PROFILE_DATA.brand}
+            </span>
           </h1>
         </div>
 
         {/* Right Interactive DKV Lanyard ID Card */}
         <div
-          className="lg:col-span-4 xl:col-span-3 flex flex-col items-start lg:items-end hero-stagger"
+          className="lg:col-span-4 xl:col-span-3 flex flex-col items-start lg:items-end hero-card-item"
           style={{ perspective: "1200px" }}
         >
           <div ref={floatWrapperRef} className="relative">
@@ -577,8 +618,8 @@ export default function Hero() {
       </div>
 
       {/* Bottom Hero Row */}
-      <div className="relative z-10 max-w-[1440px] w-full mx-auto pt-4 flex flex-col md:flex-row items-start md:items-end justify-between gap-6 hero-stagger">
-        <p className="font-sans font-medium text-xs md:text-[13px] leading-relaxed tracking-[0.08em] text-neutral-300 max-w-md uppercase">
+      <div className="relative z-10 max-w-[1440px] w-full mx-auto pt-4 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
+        <p className="hero-left-item font-sans font-medium text-xs md:text-[13px] leading-relaxed tracking-[0.08em] text-neutral-300 max-w-md uppercase">
           {PROFILE_DATA.heroTagline}
         </p>
 
@@ -586,7 +627,7 @@ export default function Hero() {
           ref={scrollLinkRef}
           href="#marquee"
           onClick={handleScrollClick}
-          className="hidden md:flex flex-col items-center gap-1 font-sans font-semibold text-[10px] tracking-[0.2em] text-neutral-500 hover:text-white transition-colors"
+          className="hero-bottom-item hidden md:flex flex-col items-center gap-1 font-sans font-semibold text-[10px] tracking-[0.2em] text-neutral-500 hover:text-white transition-colors"
         >
           <span>SCROLL</span>
           <ArrowDown
@@ -595,7 +636,7 @@ export default function Hero() {
           />
         </a>
 
-        <div className="relative inline-flex items-center justify-center">
+        <div className="hero-bottom-item relative inline-flex items-center justify-center">
           <button
             type="button"
             onClick={handleContactClick}
