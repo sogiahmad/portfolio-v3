@@ -100,7 +100,7 @@ export default function Navbar() {
           isScrolled ? "h-14 md:h-[68px]" : "h-16 md:h-20"
         }`}
       >
-        {/* Brand Logo + Border 1/9 Mengelilingi + 5 Tetesan Salju saat di Sisi Atas */}
+        {/* Brand Logo + Border 1/9 (1.8px) + Warna Hidup + 5 Tetesan Jatuh */}
         <a
           href="#top"
           onClick={() => {
@@ -112,7 +112,6 @@ export default function Navbar() {
               : "opacity-0 -translate-y-2 pointer-events-none"
           }`}
         >
-          {/* Garis 1/9 keliling (30 dari 270) + gerak lambat + perubahan warna sesuai tema */}
           <svg
             aria-hidden="true"
             viewBox="0 0 116 40"
@@ -127,14 +126,14 @@ export default function Navbar() {
               pathLength={270}
               fill="none"
               stroke="url(#brandThemeOneNinthGrad)"
-              strokeWidth="1.55"
+              strokeWidth="1.8"
               strokeLinecap="round"
               strokeDasharray="30 240"
               style={{
                 animation:
-                  "slowWaterContourFlow 8.4s linear infinite, brandThemeColorShift 6.5s ease-in-out infinite",
+                  "slowWaterContourFlow 8.4s linear infinite, brandThemeColorShift 5.5s ease-in-out infinite",
               }}
-              className="opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+              className="opacity-95 group-hover:opacity-100 transition-opacity duration-300"
             />
             <defs>
               <linearGradient
@@ -145,13 +144,14 @@ export default function Navbar() {
                 y2="100%"
               >
                 <stop offset="0%" stopColor="#FBBF24" />
-                <stop offset="50%" stopColor="#FF4D00" />
+                <stop offset="45%" stopColor="#FF4D00" />
+                <stop offset="80%" stopColor="#F59E0B" />
                 <stop offset="100%" stopColor="#FDE68A" />
               </linearGradient>
             </defs>
           </svg>
 
-          {/* 5 tetesan salju/air jatuh saat border melintas di sisi atas */}
+          {/* 5 tetesan jatuh saat border melintas di sisi atas */}
           <span
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-2 top-0.5 h-9 overflow-visible"
@@ -161,9 +161,9 @@ export default function Navbar() {
                 key={idx}
                 style={{
                   left: drop.left,
-                  animation: `topSnowDropletFall 8.4s linear ${drop.delay} infinite, brandThemeColorShift 6.5s ease-in-out infinite`,
+                  animation: `topSnowDropletFall 8.4s linear ${drop.delay} infinite, brandThemeColorShift 5.5s ease-in-out infinite`,
                 }}
-                className={`absolute top-0 ${drop.size} rounded-full bg-gradient-to-b from-amber-200 via-amber-400 to-accent shadow-[0_0_6px_rgba(251,191,36,0.8)]`}
+                className={`absolute top-0 ${drop.size} rounded-full bg-gradient-to-b from-amber-200 via-amber-400 to-accent shadow-[0_0_6px_rgba(251,191,36,0.85)]`}
               />
             ))}
           </span>
@@ -301,13 +301,13 @@ export default function Navbar() {
         @keyframes brandThemeColorShift {
           0%,
           100% {
-            filter: hue-rotate(0deg) brightness(1);
+            filter: hue-rotate(0deg) saturate(1.15) brightness(1.04);
           }
           35% {
-            filter: hue-rotate(-14deg) saturate(1.2) brightness(1.08);
+            filter: hue-rotate(-14deg) saturate(1.35) brightness(1.14);
           }
           70% {
-            filter: hue-rotate(16deg) saturate(1.15) brightness(1.05);
+            filter: hue-rotate(16deg) saturate(1.25) brightness(1.1);
           }
         }
 
