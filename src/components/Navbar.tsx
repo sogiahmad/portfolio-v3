@@ -11,6 +11,14 @@ const NAV_ITEMS = [
   { label: "CONTACT", href: "#contact", id: "contact" },
 ];
 
+const TOP_SNOW_DROPS = [
+  { left: "22%", delay: "0s", size: "w-[2px] h-1.5" },
+  { left: "34%", delay: "0.22s", size: "w-[2.5px] h-2" },
+  { left: "48%", delay: "0.1s", size: "w-[2px] h-2" },
+  { left: "62%", delay: "0.34s", size: "w-[2.5px] h-1.5" },
+  { left: "75%", delay: "0.18s", size: "w-[2px] h-2" },
+];
+
 export default function Navbar() {
   const [activeId, setActiveId] = useState<string>("");
   const [scrollProgress, setScrollProgress] = useState<number>(0);
@@ -92,7 +100,7 @@ export default function Navbar() {
           isScrolled ? "h-14 md:h-[68px]" : "h-16 md:h-20"
         }`}
       >
-        {/* Brand Logo + Garis Hidup ~2/8 Mengelilingi Tulisan */}
+        {/* Brand Logo + Border 1/9 Mengelilingi + 5 Tetesan Salju saat di Sisi Atas */}
         <a
           href="#top"
           onClick={() => {
@@ -104,38 +112,61 @@ export default function Navbar() {
               : "opacity-0 -translate-y-2 pointer-events-none"
           }`}
         >
-          {/* SVG orbit ~2/8 keliling (90 deg arc) */}
+          {/* Garis 1/9 keliling (30 dari 270) + gerak lambat + perubahan warna sesuai tema */}
           <svg
             aria-hidden="true"
-            viewBox="0 0 120 44"
-            preserveAspectRatio="none"
-            style={{ animation: "navArcSpin 5.2s linear infinite" }}
-            className="pointer-events-none absolute -inset-x-1 -inset-y-0.5 w-[calc(100%+8px)] h-[calc(100%+4px)] opacity-75 group-hover:opacity-100 transition-opacity duration-300"
+            viewBox="0 0 116 40"
+            className="pointer-events-none absolute -inset-x-1 -inset-y-0.5 w-[calc(100%+8px)] h-[calc(100%+4px)] overflow-visible"
           >
-            <ellipse
-              cx="60"
-              cy="22"
-              rx="57"
-              ry="19"
+            <rect
+              x="2"
+              y="2"
+              width="112"
+              height="36"
+              rx="18"
+              pathLength={270}
               fill="none"
-              stroke="url(#brandTwoEighthsGrad)"
-              strokeWidth="1.4"
-              strokeDasharray="68 204"
+              stroke="url(#brandThemeOneNinthGrad)"
+              strokeWidth="1.55"
               strokeLinecap="round"
+              strokeDasharray="30 240"
+              style={{
+                animation:
+                  "slowWaterContourFlow 8.4s linear infinite, brandThemeColorShift 6.5s ease-in-out infinite",
+              }}
+              className="opacity-90 group-hover:opacity-100 transition-opacity duration-300"
             />
             <defs>
               <linearGradient
-                id="brandTwoEighthsGrad"
+                id="brandThemeOneNinthGrad"
                 x1="0%"
                 y1="0%"
                 x2="100%"
-                y2="0%"
+                y2="100%"
               >
-                <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.95" />
-                <stop offset="100%" stopColor="#FF4D00" stopOpacity="0.85" />
+                <stop offset="0%" stopColor="#FBBF24" />
+                <stop offset="50%" stopColor="#FF4D00" />
+                <stop offset="100%" stopColor="#FDE68A" />
               </linearGradient>
             </defs>
           </svg>
+
+          {/* 5 tetesan salju/air jatuh saat border melintas di sisi atas */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-2 top-0.5 h-9 overflow-visible"
+          >
+            {TOP_SNOW_DROPS.map((drop, idx) => (
+              <span
+                key={idx}
+                style={{
+                  left: drop.left,
+                  animation: `topSnowDropletFall 8.4s linear ${drop.delay} infinite, brandThemeColorShift 6.5s ease-in-out infinite`,
+                }}
+                className={`absolute top-0 ${drop.size} rounded-full bg-gradient-to-b from-amber-200 via-amber-400 to-accent shadow-[0_0_6px_rgba(251,191,36,0.8)]`}
+              />
+            ))}
+          </span>
 
           <span className="relative z-10 inline-flex items-start">
             <span>{PROFILE_DATA.brand}</span>
@@ -143,58 +174,24 @@ export default function Navbar() {
           </span>
         </a>
 
-        {/* Center Status Pill + Garis Hidup ~3/8 + Hover Hijau */}
+        {/* Center Status Pill */}
         <div
-          className={`group/pill relative hidden md:flex items-center gap-2.5 bg-white/[0.04] hover:bg-emerald-500/[0.06] border border-white/[0.09] hover:border-emerald-400/35 rounded-full px-4 py-1.5 transition-all duration-500 ease-out ${
+          className={`group/pill hidden md:flex items-center gap-2.5 bg-white/[0.04] hover:bg-emerald-500/[0.07] border border-white/[0.09] hover:border-emerald-400/35 rounded-full px-4 py-1.5 transition-all duration-500 ease-out ${
             navTextVisible
               ? "opacity-100 translate-y-0"
               : "opacity-0 -translate-y-2 pointer-events-none"
           }`}
         >
-          {/* Garis hidup ~3/8 keliling (135 deg arc), menyala hijau saat hover */}
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 260 40"
-            preserveAspectRatio="none"
-            style={{ animation: "navArcSpin 6s linear infinite" }}
-            className="pointer-events-none absolute -inset-x-1 -inset-y-0.5 w-[calc(100%+8px)] h-[calc(100%+4px)] text-emerald-400/45 group-hover/pill:text-emerald-400 transition-colors duration-300"
-          >
-            <rect
-              x="2"
-              y="2"
-              width="256"
-              height="36"
-              rx="18"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeDasharray="195 325"
-              strokeLinecap="round"
-            />
-          </svg>
-
-          <span className="relative z-10 flex h-2.5 w-2.5 items-center justify-center">
-            <span
-              style={{
-                animation: "sonarPulse 2.4s cubic-bezier(0, 0, 0.2, 1) infinite",
-              }}
-              className="absolute inline-flex h-full w-full rounded-full bg-emerald-400/75"
-            />
-            <span
-              style={{
-                animation:
-                  "sonarPulse 2.4s cubic-bezier(0, 0, 0.2, 1) 1.2s infinite",
-              }}
-              className="absolute inline-flex h-full w-full rounded-full bg-emerald-300/60"
-            />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400 shadow-[0_0_10px_#34d399] transition-transform duration-300 group-hover/pill:scale-125" />
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400 shadow-[0_0_8px_#34d399] transition-transform duration-300 group-hover/pill:scale-125" />
           </span>
-          <span className="relative z-10 font-sans font-semibold text-[11px] tracking-[0.14em] text-neutral-300 group-hover/pill:text-emerald-200 uppercase transition-colors">
+          <span className="font-sans font-semibold text-[11px] tracking-[0.14em] text-neutral-300 group-hover/pill:text-emerald-200 uppercase transition-colors">
             {PROFILE_DATA.roleBadge}
           </span>
         </div>
 
-        {/* Desktop Nav Links + Underline Warna Tema + Riak */}
+        {/* Desktop Nav Links */}
         <nav
           className={`hidden sm:flex items-center gap-6 md:gap-8 transition-all duration-700 delay-100 ease-out ${
             navTextVisible
@@ -292,26 +289,45 @@ export default function Navbar() {
       </div>
 
       <style jsx>{`
-        @keyframes navArcSpin {
+        @keyframes slowWaterContourFlow {
           from {
-            transform: rotate(0deg);
+            stroke-dashoffset: 0;
           }
           to {
-            transform: rotate(360deg);
+            stroke-dashoffset: -270;
           }
         }
 
-        @keyframes sonarPulse {
-          0% {
-            transform: scale(0.9);
-            opacity: 0.85;
+        @keyframes brandThemeColorShift {
+          0%,
+          100% {
+            filter: hue-rotate(0deg) brightness(1);
+          }
+          35% {
+            filter: hue-rotate(-14deg) saturate(1.2) brightness(1.08);
           }
           70% {
-            transform: scale(2.5);
+            filter: hue-rotate(16deg) saturate(1.15) brightness(1.05);
+          }
+        }
+
+        @keyframes topSnowDropletFall {
+          0%,
+          64% {
+            transform: translateY(0px) scale(0.75);
             opacity: 0;
           }
+          70% {
+            transform: translateY(2px) scale(1);
+            opacity: 0.95;
+          }
+          86% {
+            transform: translateY(16px) scale(0.95);
+            opacity: 0.6;
+          }
+          93%,
           100% {
-            transform: scale(2.5);
+            transform: translateY(22px) scale(0.6);
             opacity: 0;
           }
         }
