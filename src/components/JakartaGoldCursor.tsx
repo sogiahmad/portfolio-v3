@@ -21,7 +21,6 @@ export default function JakartaGoldCursor() {
     let rafId: number;
 
     const shouldShowGoldGlow = (clientX: number, clientY: number) => {
-      // 1. Tiadakan di section awal (Hero / #top)
       const heroEl = document.getElementById("top");
       if (heroEl) {
         const heroRect = heroEl.getBoundingClientRect();
@@ -30,7 +29,6 @@ export default function JakartaGoldCursor() {
         }
       }
 
-      // 2. Tiadakan di About Me (#about), gambar, & section gambar (#projects)
       const hoveredEl = document.elementFromPoint(clientX, clientY);
       if (hoveredEl) {
         if (
