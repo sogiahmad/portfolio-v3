@@ -15,12 +15,22 @@ export default function Navbar() {
   const [activeId, setActiveId] = useState<string>("");
   const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
+  const [navTextVisible, setNavTextVisible] = useState<boolean>(false);
+
+  useEffect(() => {
+    const showTimer = window.setTimeout(() => {
+      setNavTextVisible(true);
+    }, 750);
+
+    return () => window.clearTimeout(showTimer);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
       const doc = document.documentElement;
       const maxScroll = doc.scrollHeight - window.innerHeight;
-      const ratio = maxScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0;
+      const ratio =
+        maxScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0;
       setScrollProgress(ratio * 100);
 
       const currentPos = window.scrollY + 180;
@@ -49,14 +59,24 @@ export default function Navbar() {
             setActiveId("");
             setMobileOpen(false);
           }}
-          className="font-display text-base md:text-lg tracking-[0.04em] text-white inline-flex items-start group"
+          className={`font-display text-base md:text-lg tracking-[0.04em] text-white inline-flex items-start group transition-all duration-700 ease-out ${
+            navTextVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 -translate-y-2 pointer-events-none"
+          }`}
         >
           <span>{PROFILE_DATA.brand}</span>
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-accent ml-0.5 mt-0.5 transition-transform duration-300 group-hover:scale-125" />
         </a>
 
         {/* Center Status Pill */}
-        <div className="hidden md:flex items-center gap-2.5 bg-white/[0.04] border border-white/[0.09] rounded-full px-4 py-1.5">
+        <div
+          className={`hidden md:flex items-center gap-2.5 bg-white/[0.04] border border-white/[0.09] rounded-full px-4 py-1.5 transition-all duration-700 delay-75 ease-out ${
+            navTextVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 -translate-y-2 pointer-events-none"
+          }`}
+        >
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -67,7 +87,13 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Nav Links */}
-        <nav className="hidden sm:flex items-center gap-6 md:gap-8">
+        <nav
+          className={`hidden sm:flex items-center gap-6 md:gap-8 transition-all duration-700 delay-100 ease-out ${
+            navTextVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 -translate-y-2 pointer-events-none"
+          }`}
+        >
           {NAV_ITEMS.map((item) => {
             const isActive = activeId === item.id;
             return (
@@ -75,7 +101,9 @@ export default function Navbar() {
                 key={item.label}
                 href={item.href}
                 className={`relative py-1 font-sans font-bold text-[11px] md:text-xs tracking-[0.14em] uppercase transition-colors ${
-                  isActive ? "text-amber-300" : "text-neutral-300 hover:text-white"
+                  isActive
+                    ? "text-amber-300"
+                    : "text-neutral-300 hover:text-white"
                 }`}
               >
                 <span>{item.label}</span>
@@ -94,9 +122,15 @@ export default function Navbar() {
           type="button"
           aria-label="Toggle navigation menu"
           onClick={() => setMobileOpen((prev) => !prev)}
-          className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/[0.05] border border-white/10 text-neutral-200 hover:text-white cursor-pointer"
+          className={`sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/[0.05] border border-white/10 text-neutral-200 hover:text-white cursor-pointer transition-opacity duration-700 ${
+            navTextVisible ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
         >
-          {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          {mobileOpen ? (
+            <X className="w-4 h-4" />
+          ) : (
+            <Menu className="w-4 h-4" />
+          )}
         </button>
       </div>
 
